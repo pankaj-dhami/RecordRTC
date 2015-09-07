@@ -262,6 +262,7 @@
             $.ajax({
                 method: "GET",
                 url: "MergeALL",
+                async:true,
                 success: function (data) {
                     container.appendChild(document.createElement('hr'));
                     var mediaElement = document.createElement("video");
