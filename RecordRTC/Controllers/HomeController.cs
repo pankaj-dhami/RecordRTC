@@ -55,18 +55,7 @@ namespace RecordRTC.Controllers
                 var path = AppDomain.CurrentDomain.BaseDirectory + "ffmpeg/uploads/";
                 var file = Request.Files[upload];
                 if (file == null) continue;
-                if (Session["filename"] == null)
-                {
-                    Session["filename"] = new List<string>();
-                }
-                else
-                {
-                    lstFilenames = (Session["filename"] as List<string>);
-                }
-
-                lstFilenames.Add(Path.Combine(path, Request.Form[0]));
-                Session["filename"] = lstFilenames;
-
+              
                 file.SaveAs(Path.Combine(path, Request.Form[0]));
             }
             return Json(Request.Form[0]);
@@ -87,122 +76,104 @@ namespace RecordRTC.Controllers
         {
             var ffmpegpath = AppDomain.CurrentDomain.BaseDirectory + "ffmpeg\\";
             var uploadpath = ffmpegpath + "uploads\\";
-            // lstFilenames = (List<string>)(Session["filename"]);
-            List<FilesPath> lstmp4Files = new List<FilesPath>();
-            List<FilesPath> lstwavFiles = new List<FilesPath>();
+            //// lstFilenames = (List<string>)(Session["filename"]);
+            //List<FilesPath> lstmp4Files = new List<FilesPath>();
+            //List<FilesPath> lstwavFiles = new List<FilesPath>();
 
-            List<string> allmp4files = Directory.GetFiles(uploadpath, "*.mp4*", SearchOption.AllDirectories).ToList();
-            List<string> allwavfiles = Directory.GetFiles(uploadpath, "*.wav*", SearchOption.AllDirectories).ToList();
+            //List<string> allmp4files = Directory.GetFiles(uploadpath, "*.mp4*", SearchOption.AllDirectories).ToList();
+            //List<string> allwavfiles = Directory.GetFiles(uploadpath, "*.wav*", SearchOption.AllDirectories).ToList();
 
-            foreach (var item in allmp4files)
-            {
-                FileInfo f = new FileInfo(item);
-                FilesPath file = new FilesPath();
-                file.File = f;
-                string OrderBy = f.Name.Substring(0, f.Name.LastIndexOf('.'));
-                string fileType = f.Name.Substring(f.Name.LastIndexOf('.') + 1, 3);
-                if (fileType.ToLower().Equals("mp4"))
-                {
-                    file.Mp4FilePath = item;
-                    file.FileType = 2;
-                }
-                else if (fileType.ToLower().Equals("wav"))
-                {
-                    file.WavFileType = item;
-                    file.FileType = 1;
-                }
-                file.OrderBy = Convert.ToInt32(OrderBy);
-                lstmp4Files.Add(file);
-            }
-            foreach (var item in allwavfiles)
-            {
-                FileInfo f = new FileInfo(item);
-                FilesPath file = new FilesPath();
-                file.File = f;
-                string OrderBy = f.Name.Substring(0, f.Name.LastIndexOf('.'));
-                string fileType = f.Name.Substring(f.Name.LastIndexOf('.') + 1, 3);
-                if (fileType.ToLower().Equals("mp4"))
-                {
-                    file.Mp4FilePath = item;
-                    file.FileType = 2;
-                }
-                else if (fileType.ToLower().Equals("wav"))
-                {
-                    file.WavFileType = item;
-                    file.FileType = 1;
-                }
-                file.OrderBy = Convert.ToInt32(OrderBy);
-                lstwavFiles.Add(file);
-            }
+            //foreach (var item in allmp4files)
+            //{
+            //    FileInfo f = new FileInfo(item);
+            //    FilesPath file = new FilesPath();
+            //    file.File = f;
+            //    string OrderBy = f.Name.Substring(0, f.Name.LastIndexOf('.'));
+            //    string fileType = f.Name.Substring(f.Name.LastIndexOf('.') + 1, 3);
+            //    if (fileType.ToLower().Equals("mp4"))
+            //    {
+            //        file.Mp4FilePath = item;
+            //        file.FileType = 2;
+            //    }
+            //    else if (fileType.ToLower().Equals("wav"))
+            //    {
+            //        file.WavFileType = item;
+            //        file.FileType = 1;
+            //    }
+            //    file.OrderBy = Convert.ToInt32(OrderBy);
+            //    lstmp4Files.Add(file);
+            //}
+            //foreach (var item in allwavfiles)
+            //{
+            //    FileInfo f = new FileInfo(item);
+            //    FilesPath file = new FilesPath();
+            //    file.File = f;
+            //    string OrderBy = f.Name.Substring(0, f.Name.LastIndexOf('.'));
+            //    string fileType = f.Name.Substring(f.Name.LastIndexOf('.') + 1, 3);
+            //    if (fileType.ToLower().Equals("mp4"))
+            //    {
+            //        file.Mp4FilePath = item;
+            //        file.FileType = 2;
+            //    }
+            //    else if (fileType.ToLower().Equals("wav"))
+            //    {
+            //        file.WavFileType = item;
+            //        file.FileType = 1;
+            //    }
+            //    file.OrderBy = Convert.ToInt32(OrderBy);
+            //    lstwavFiles.Add(file);
+            //}
 
-            lstmp4Files = lstmp4Files.OrderBy(a => a.OrderBy).ToList();
-            lstwavFiles = lstwavFiles.OrderBy(a => a.OrderBy).ToList();
-
-
-            //  string[] wavfiles = Directory.GetFiles(uploadpath, "*.wav", SearchOption.AllDirectories).ToList().OrderBy(a => a).ToArray();
+            //lstmp4Files = lstmp4Files.OrderBy(a => a.OrderBy).ToList();
+            //lstwavFiles = lstwavFiles.OrderBy(a => a.OrderBy).ToList();
 
 
-            using (StreamWriter writer = new StreamWriter(ffmpegpath + "batchcmd.bat"))
-            {
-                writer.WriteLine("echo y | del merged\\*.mp4*");
+            //using (StreamWriter writer = new StreamWriter(ffmpegpath + "batchcmd.bat"))
+            //{
+            //    writer.WriteLine("echo y | del merged\\*.mp4*");
+            //    string intermediateFile = string.Empty;
+            //    foreach (var item in lstmp4Files)
+            //    {
+            //        string fileName = item.File.Name;
+            //        writer.WriteLine("bin\\ffmpeg -y -i \"{0}\" -qscale:v 1 {1}.mpg", "uploads\\" + fileName, fileName);
+            //        intermediateFile += "|" + fileName + ".mpg";
+            //        FilesPath wavFile = lstwavFiles.Where(a => a.OrderBy == item.OrderBy).FirstOrDefault();
+            //        if (wavFile != null)
+            //        {
+            //            fileName = wavFile.File.Name;
+            //            writer.WriteLine("bin\\ffmpeg -y -i \"{0}\" -qscale:v 1 {1}.mpg", "uploads\\" + fileName, fileName);
+            //            intermediateFile += "|" + fileName + ".mpg";
+            //        }
+            //    }
+            //    intermediateFile = intermediateFile.Remove(0, 1);
+            //    Session["filename"] = new List<string>();
 
-                //for (int i = 0; i < lstFiles.Count; i++)
-                //{
-                //    FileInfo f = new FileInfo(lstFiles[i].file);
-
-                //    string fileName = f.Name;//mp4files[i].Substring(mp4files[i].LastIndexOf('\'') + 1, mp4files[i].LastIndexOf('.'));
-                //    writer.WriteLine("bin\\ffmpeg -y -i \"{0}\" -qscale:v 1 {1}.mpg", "uploads\\" + fileName, fileName);
-                //    intermediateFile += "|" + fileName + ".mpg";
-                //    //f = new FileInfo(wavfiles[i]);
-                //    //fileName = f.Name;//.Substring(0, wavfiles[i].LastIndexOf('.'));
-                //    //writer.WriteLine("bin\\ffmpeg -y -i \"{0}\" -qscale:v 1 {1}.mpg", "uploads\\" + fileName, fileName);
-                //    //intermediateFile += "|" + fileName + ".mpg";
-                //}
-                string intermediateFile = string.Empty;
-                foreach (var item in lstmp4Files)
-                {
-                    string fileName = item.File.Name;
-                    writer.WriteLine("bin\\ffmpeg -y -i \"{0}\" -qscale:v 1 {1}.mpg", "uploads\\" + fileName, fileName);
-                    intermediateFile += "|" + fileName + ".mpg";
-                    FilesPath wavFile = lstwavFiles.Where(a => a.OrderBy == item.OrderBy).FirstOrDefault();
-                    if (wavFile != null)
-                    {
-                        fileName = wavFile.File.Name;
-                        writer.WriteLine("bin\\ffmpeg -y -i \"{0}\" -qscale:v 1 {1}.mpg", "uploads\\" + fileName, fileName);
-                        intermediateFile += "|" + fileName + ".mpg";
-                    }
-                }
-                intermediateFile = intermediateFile.Remove(0, 1);
-                Session["filename"] = new List<string>();
-
-                writer.WriteLine("bin\\ffmpeg -y -i concat:\"{0}\" -c copy intermediate_all.mpg", intermediateFile);
-                writer.WriteLine("bin\\ffmpeg -y -i intermediate_all.mpg -qscale:v 2 merged\\output.mp4");
-                writer.WriteLine("echo y | del *.mpg*");
-                writer.WriteLine("echo y | del uploads\\*.wav*");
-                writer.WriteLine("echo y | del uploads\\*.mp4*");
+            //    writer.WriteLine("bin\\ffmpeg -y -i concat:\"{0}\" -c copy intermediate_all.mpg", intermediateFile);
+            //    writer.WriteLine("bin\\ffmpeg -y -i intermediate_all.mpg -qscale:v 2 merged\\output.mp4");
+            //    writer.WriteLine("echo y | del *.mpg*");
+            //    writer.WriteLine("echo y | del uploads\\*.wav*");
+            //    writer.WriteLine("echo y | del uploads\\*.mp4*");
 
 
-                writer.Close();
-            }
+            //    writer.Close();
+            //}
 
 
             Process proc = null;
-            try
-            {
+           
                 proc = new Process();
                 proc.StartInfo.WorkingDirectory = ffmpegpath;
-                proc.StartInfo.FileName = ffmpegpath + "batchcmd.bat";
+                proc.StartInfo.FileName = ffmpegpath + "batch.bat";
                 proc.StartInfo.CreateNoWindow = true;
-                proc.StartInfo.UseShellExecute = false;
+              //  proc.StartInfo.UseShellExecute = false;
                 proc.Start();
                 proc.WaitForExit();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception Occurred :{0},{1}", ex.Message, ex.StackTrace.ToString());
-            }
+       
+            
+              //  Console.WriteLine("Exception Occurred :{0},{1}", ex.Message, ex.StackTrace.ToString());
 
-            return "/ffmpeg/merged/output.mp4";
+
+                return ffmpegpath;//"/ffmpeg/merged/output.mp4";
 
         }
 
