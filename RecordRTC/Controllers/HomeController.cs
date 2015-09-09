@@ -130,40 +130,50 @@ namespace RecordRTC.Controllers
             lstmp4Files = lstmp4Files.OrderBy(a => a.OrderBy).ToList();
             lstwavFiles = lstwavFiles.OrderBy(a => a.OrderBy).ToList();
 
-
-            using (StreamWriter writer = new StreamWriter(ffmpegpath + "batchcmd.bat"))
+            try
             {
-                writer.WriteLine("echo y | del merged\\*.mp4*");
-                string intermediateFile = string.Empty;
-                foreach (var item in lstmp4Files)
+
+                using (StreamWriter writer = new StreamWriter(ffmpegpath + "batchcmd.bat"))
                 {
-                    string fileName = item.File.Name;
-                    writer.WriteLine("bin\\ffmpeg -y -i \"{0}\" -qscale:v 1 {1}.mpg", "uploads\\" + fileName, fileName);
-                    intermediateFile += "|" + fileName + ".mpg";
-                    FilesPath wavFile = lstwavFiles.Where(a => a.OrderBy == item.OrderBy).FirstOrDefault();
-                    if (wavFile != null)
+                    writer.WriteLine("echo y | del merged\\*.mp4*");
+                    string intermediateFile = string.Empty;
+                    foreach (var item in lstmp4Files)
                     {
-                        fileName = wavFile.File.Name;
-                        writer.WriteLine("bin\\ffmpeg -y -i \"{0}\" -qscale:v 1 {1}.mpg", "uploads\\" + fileName, fileName);
-                        intermediateFile += "|" + fileName + ".mpg";
+                        string fileName = item.File.Name;
+                        //writer.WriteLine("bin\\ffmpeg -y -i \"{0}\" -qscale:v 1 {1}.mpg", "uploads\\" + fileName, fileName);
+                        //intermediateFile += "|" + fileName + ".mpg";
+                        FilesPath wavFile = lstwavFiles.Where(a => a.OrderBy == item.OrderBy).FirstOrDefault();
+                        if (wavFile != null)
+                        {
+                            fileName = wavFile.File.Name;
+                            writer.WriteLine("bin\\ffmpeg -y -i \"{0}\" -qscale:v 1 {1}.mpg", "uploads\\" + fileName, fileName);
+                            intermediateFile += "|" + fileName + ".mpg";
+                        }
                     }
+                    intermediateFile = intermediateFile.Remove(0, 1);
+                    Session["filename"] = new List<string>();
+
+                    writer.WriteLine("bin\\ffmpeg -y -i concat:\"{0}\" -c copy intermediate_all.mpg", intermediateFile);
+                    writer.WriteLine("bin\\ffmpeg -y -i intermediate_all.mpg -qscale:v 2 merged\\output.wav");
+                    writer.WriteLine("echo y | del *.mpg*");
+                    writer.WriteLine("echo y | del uploads\\*.wav*");
+                    writer.WriteLine("echo y | del uploads\\*.mp4*");
+
+
+                    writer.Close();
                 }
-                intermediateFile = intermediateFile.Remove(0, 1);
-                Session["filename"] = new List<string>();
+            }
+            catch (Exception ex)
+            {
 
-                writer.WriteLine("bin\\ffmpeg -y -i concat:\"{0}\" -c copy intermediate_all.mpg", intermediateFile);
-                writer.WriteLine("bin\\ffmpeg -y -i intermediate_all.mpg -qscale:v 2 merged\\output.mp4");
-                writer.WriteLine("echo y | del *.mpg*");
-                writer.WriteLine("echo y | del uploads\\*.wav*");
-                writer.WriteLine("echo y | del uploads\\*.mp4*");
-
-
-                writer.Close();
+                return ex.ToString();
             }
 
 
-            Process proc = null;
-           
+            try
+            {
+                Process proc = null;
+
                 proc = new Process();
                 proc.StartInfo.WorkingDirectory = ffmpegpath;
                 proc.StartInfo.FileName = ffmpegpath + "batchcmd.bat";
@@ -171,12 +181,22 @@ namespace RecordRTC.Controllers
                 proc.StartInfo.UseShellExecute = false;
                 proc.Start();
                 proc.WaitForExit();
+                if (Directory.Exists(uploadpath))
+                {
+                    Directory.Delete(uploadpath);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return ex.ToString();
+            }
        
             
               //  Console.WriteLine("Exception Occurred :{0},{1}", ex.Message, ex.StackTrace.ToString());
 
 
-                return "/ffmpeg/merged/output.mp4";
+                return "/ffmpeg/merged/output.wav";
 
         }
 

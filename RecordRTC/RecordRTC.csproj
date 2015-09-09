@@ -118,6 +118,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="ffmpeg\merged\" />
     <Folder Include="ffmpeg\uploads\" />
     <Folder Include="Models\" />
     <Folder Include="uploads\" />
@@ -149,7 +150,6 @@
     <Content Include="ffmpeg\bin\postproc-52.dll" />
     <Content Include="ffmpeg\bin\swresample-0.dll" />
     <Content Include="ffmpeg\bin\swscale-2.dll" />
-    <Content Include="ffmpeg\merged\output.mp4" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -157,6 +157,7 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="ffmpeg\batch.bat" />
     <Content Include="ffmpeg\batchcmd.bat" />
+    <None Include="Properties\PublishProfiles\recordrtc3 %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\recordrtc3.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
