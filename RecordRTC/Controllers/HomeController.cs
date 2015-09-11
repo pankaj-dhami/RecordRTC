@@ -55,11 +55,11 @@ namespace RecordRTC.Controllers
                 var path = AppDomain.CurrentDomain.BaseDirectory + "ffmpeg/uploads/";
                 if (!Directory.Exists(path))
                 {
-                     Directory.CreateDirectory(path);
+                    Directory.CreateDirectory(path);
                 }
                 var file = Request.Files[upload];
                 if (file == null) continue;
-              
+
                 file.SaveAs(Path.Combine(path, Request.Form[0]));
             }
             return Json(Request.Form[0]);
@@ -129,13 +129,18 @@ namespace RecordRTC.Controllers
 
             lstmp4Files = lstmp4Files.OrderBy(a => a.OrderBy).ToList();
             lstwavFiles = lstwavFiles.OrderBy(a => a.OrderBy).ToList();
-
+            Random r = new Random();
+            string outputFile = "output" + r.Next(1, 10000) + ".mp4";
+            string batfile = ffmpegpath + "batch" + r.Next(1, 10000) + ".bat";
             try
             {
-
-                using (StreamWriter writer = new StreamWriter(ffmpegpath + "batchcmd.bat"))
+                using (System.IO.File.Create(batfile))
                 {
-                    writer.WriteLine("echo y | del merged\\*.mp4*");
+                }
+
+                using (StreamWriter writer = new StreamWriter(batfile))
+                {
+                    // writer.WriteLine("echo y | del merged\\*.mp4*");
                     string intermediateFile = string.Empty;
                     foreach (var item in lstmp4Files)
                     {
@@ -154,12 +159,10 @@ namespace RecordRTC.Controllers
                     Session["filename"] = new List<string>();
 
                     writer.WriteLine("bin\\ffmpeg -y -i concat:\"{0}\" -c copy intermediate_all.mpg", intermediateFile);
-                    writer.WriteLine("bin\\ffmpeg -y -i intermediate_all.mpg -qscale:v 2 merged\\output.wav");
+                    writer.WriteLine("bin\\ffmpeg -y -i intermediate_all.mpg -qscale:v 2 merged\\" + outputFile);
                     writer.WriteLine("echo y | del *.mpg*");
                     writer.WriteLine("echo y | del uploads\\*.wav*");
                     writer.WriteLine("echo y | del uploads\\*.mp4*");
-
-
                     writer.Close();
                 }
             }
@@ -176,27 +179,24 @@ namespace RecordRTC.Controllers
 
                 proc = new Process();
                 proc.StartInfo.WorkingDirectory = ffmpegpath;
-                proc.StartInfo.FileName = ffmpegpath + "batchcmd.bat";
+                proc.StartInfo.FileName = batfile;
                 proc.StartInfo.CreateNoWindow = true;
                 proc.StartInfo.UseShellExecute = false;
                 proc.Start();
                 proc.WaitForExit();
-                if (Directory.Exists(uploadpath))
-                {
-                    Directory.Delete(uploadpath);
-                }
+              
             }
             catch (Exception ex)
             {
 
                 return ex.ToString();
             }
-       
-            
-              //  Console.WriteLine("Exception Occurred :{0},{1}", ex.Message, ex.StackTrace.ToString());
 
 
-                return "/ffmpeg/merged/output.wav";
+            //  Console.WriteLine("Exception Occurred :{0},{1}", ex.Message, ex.StackTrace.ToString());
+
+            System.IO.File.Delete(batfile);
+            return "/ffmpeg/merged/" + outputFile;
 
         }
 
